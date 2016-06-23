@@ -1,0 +1,26 @@
+{
+  "name": "facebook-send-api",
+  "version": "1.0.0",
+  "description": "Promise based module to speak to the facebook send api",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "tsc --project ./src/"
+  },
+  "typings": "lib/index",
+  "keywords": [
+    "facebook",
+    "messenger",
+    "send"
+  ],
+  "author": "Adam Juhasz",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "request-promise": "^2.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4"
+  }
+}
