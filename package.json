@@ -1,7 +1,7 @@
 {
   "name": "facebook-send-api",
   "version": "1.0.0",
-  "description": "Promise based module to speak to the facebook send api",
+  "description": "typescript & promise based module for facebook's messenger send api",
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
