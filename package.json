@@ -1,8 +1,8 @@
 {
   "name": "facebook-send-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Promise based module to speak to the facebook send api",
-  "main": "build/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "tsc --project ./src/"
