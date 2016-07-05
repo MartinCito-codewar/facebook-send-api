@@ -36,22 +36,33 @@ export interface MessengerMessage {
     attachment?: MessengerAttachement;
     text?: string;
     quick_replies?: Array<MessengerQuickReply>;
+    metadata?: string;
 }
 export interface MessengerPayload {
     recipient: {
-        id: string;
+        id?: string;
+        phone_number?: string;
     };
     message?: MessengerMessage;
     sender_action?: string;
+    notification_type?: string;
 }
 export interface MessengerResponse {
     recipient_id: string;
     message_id: string;
 }
+export interface MessengerError {
+    error: {
+        message: string;
+        type: string;
+        code: Number;
+        fbtrace_id: string;
+    };
+}
 export default class FBMessenger {
     private token;
     constructor(token: string);
-    sendToFB(id: string, payload: MessengerPayload): Promise<MessengerResponse>;
+    private sendToFB(id, payload);
     sendMessageToFB(id: string, message: MessengerMessage): Promise<MessengerResponse>;
     sendGenericMessage(id: string, elements: Array<MessengerItem>): Promise<MessengerResponse>;
     sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton>): Promise<MessengerResponse>;
@@ -60,4 +71,8 @@ export default class FBMessenger {
     sendSenderAction(id: string, senderAction: string): Promise<MessengerResponse>;
     sendTypingIndicators(id: string): Promise<MessengerResponse>;
     sendReadReceipt(id: string): Promise<MessengerResponse>;
+    private sendSettingsToFB(payload);
+    setGetStartedPostback(payload: string): Promise<any>;
+    setPersistentMenu(buttons: Array<MessengerButton>): Promise<any>;
+    setGreetingText(text: string): Promise<any>;
 }

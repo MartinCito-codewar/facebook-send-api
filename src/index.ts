@@ -45,14 +45,17 @@ export interface MessengerMessage {
   attachment?: MessengerAttachement,
   text?: string,
   quick_replies?: Array<MessengerQuickReply>,
+  metadata?: string,
 }
 
 export interface MessengerPayload {
   recipient: {
-    id: string,
+    id?: string,
+    phone_number?: string,
   },
   message?: MessengerMessage,
   sender_action?: string,
+  notification_type?: string,
 }
 
 export interface MessengerResponse {
@@ -60,20 +63,44 @@ export interface MessengerResponse {
   message_id: string,
 }
 
+export interface MessengerError {
+  error: {
+    message: string,
+    type: string,
+    code: Number,
+    fbtrace_id: string,
+  },
+}
+
+interface MessengerPostback {
+  payload: string,
+}
+
+interface MessengerSettings {
+  setting_type: string,
+  thread_state?: string,
+  call_to_actions?: Array<MessengerPostback> | Array<MessengerButton>,
+  greeting?: {
+    text: string,
+  },
+}
+
+const FBGraphURL = 'https://graph.facebook.com/v2.6/me/';
+
 export default class FBMessenger {
   private token: string;
   constructor(token: string) {
     this.token = token;
   }
 
-  public sendToFB(id:string, payload:MessengerPayload): Promise<MessengerResponse> {
+  private sendToFB(id:string, payload:MessengerPayload): Promise<MessengerResponse> {
     if (process.env.FYND_ENV === 'local') {
       console.log(`[${id}] ${JSON.stringify(payload)}`);
       return Promise.resolve(null);
     }
 
     const requstPayload = {
-      url: process.env.FB_GRAPHURL,
+      url: `${FBGraphURL}/messages`,
       qs: { access_token: this.token },
       method: 'POST',
       json: payload,
@@ -171,5 +198,56 @@ export default class FBMessenger {
 
   public sendReadReceipt(id: string) {
     return this.sendSenderAction(id, 'mark_seen');
+  }
+
+  private sendSettingsToFB(payload: MessengerSettings) {
+    const requstPayload = {
+      url: `${FBGraphURL}/thread_settings`,
+      qs: { access_token: this.token },
+      method: 'POST',
+      json: payload,
+    };
+
+    return rp(requstPayload)
+      .then((body) => {
+        if (body.error) {
+          console.error('Error (messageData):', payload, body.error);
+          throw new Error(body.error);
+        }
+        return body;
+      })
+  }
+
+  public setGetStartedPostback(payload: string) {
+    const messengerpayload: MessengerSettings = {
+      setting_type: 'call_to_actions',
+      thread_state: 'new_thread',
+      call_to_actions:  [{
+        payload,
+      }]
+    };
+
+    return this.sendSettingsToFB(messengerpayload);
+  }
+
+  public setPersistentMenu(buttons: Array<MessengerButton>) {
+    const messengerPayload: MessengerSettings = {
+      setting_type: 'call_to_actions',
+      thread_state: 'existing_thread',
+      call_to_actions: buttons,
+    };
+
+    return this.sendSettingsToFB(messengerPayload);
+  }
+
+  public setGreetingText(text: string) {
+    const messengerPayload: MessengerSettings = {
+      setting_type: 'greeting',
+      greeting: {
+        text,
+      },
+    };
+
+    return this.sendSettingsToFB(messengerPayload);
   }
 }

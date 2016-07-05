@@ -1,8 +1,11 @@
 {
   "name": "facebook-send-api",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "Promise based module to speak to the facebook send api",
   "main": "lib/index.js",
+  "bin": {
+    "sendapi": "./cli.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "tsc --project ./src/"
@@ -21,6 +24,7 @@
   },
   "dependencies": {
     "bluebird": "^3.3.5",
+    "commander": "^2.9.0",
     "request-promise": "^2.0.1"
   },
   "devDependencies": {
