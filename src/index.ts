@@ -1,6 +1,12 @@
 import * as Promise from 'bluebird';
 import * as rp from 'request-promise';
 
+export interface MessengerQuickReply {
+  content_type: string,
+  title: string,
+  payload: string,
+}
+
 export interface MessengerButton {
   type: string,
   title: string,
@@ -38,6 +44,15 @@ export interface MessengerAttachement {
 export interface MessengerMessage {
   attachment?: MessengerAttachement,
   text?: string,
+  quick_replies?: Array<MessengerQuickReply>,
+}
+
+export interface MessengerPayload {
+  recipient: {
+    id: string,
+  },
+  message?: MessengerMessage,
+  sender_action?: string,
 }
 
 export interface MessengerResponse {
@@ -51,33 +66,47 @@ export default class FBMessenger {
     this.token = token;
   }
 
-  public sendToFB(id:string, message:MessengerMessage): Promise<MessengerResponse> {
+  public sendToFB(id:string, payload:MessengerPayload): Promise<MessengerResponse> {
     if (process.env.FYND_ENV === 'local') {
-      console.log(`[${id}] ${JSON.stringify(message)}`);
+      console.log(`[${id}] ${JSON.stringify(payload)}`);
       return Promise.resolve(null);
     }
 
-    const payload = {
+    const requstPayload = {
       url: process.env.FB_GRAPHURL,
       qs: { access_token: this.token },
       method: 'POST',
-      json: {
-        recipient: { id },
-        message,
-      },
+      json: payload,
     };
 
-    return rp(payload)
+    return rp(requstPayload)
       .then((body) => {
         if (body.error) {
-          console.error('Error (messageData):', message, body.error);
+          console.error('Error (messageData):', payload, body.error);
           throw new Error(body.error);
         }
         return body;
       })
   }
 
+  public sendMessageToFB(id: string, message:MessengerMessage) {
+    const mesengerPayload: MessengerPayload = {
+      recipient: { id },
+      message,
+    };
+
+    return this.sendToFB(id, mesengerPayload);
+  }
+
   public sendGenericMessage(id: string, elements: Array<MessengerItem>) {
+    if (elements.length > 10) {
+      throw new Error('Too many elements');
+    }
+    
+    //title has length max of 80
+    //subtitle has length max of 80
+    //buttons is limited to 3
+
     const messageData: MessengerMessage = {
       'attachment': {
         'type': 'template',
@@ -87,7 +116,7 @@ export default class FBMessenger {
         },
       },
     };
-    return this.sendToFB(id, messageData);
+    return this.sendMessageToFB(id, messageData);
   }
 
   public sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton>) {
@@ -101,7 +130,7 @@ export default class FBMessenger {
         },
       },
     };
-    return this.sendToFB(id, messageData);
+    return this.sendMessageToFB(id, messageData);
   }
 
   public sendTextMessage(id: string, text: string) {
@@ -109,6 +138,30 @@ export default class FBMessenger {
       text,
     };
 
-    return this.sendToFB(id, messageData);
+    return this.sendMessageToFB(id, messageData);
+  }
+
+  public sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>) {
+    if (quickReplies.length > 10) {
+      throw new Error('Quick replies limited to 10');
+    }
+
+    const messageData: MessengerMessage = {
+      text,
+      quick_replies: quickReplies,
+    }
+
+    return this.sendMessageToFB(id, messageData);
+  }
+
+  public sendSenderAction(id: string, senderAction: string) {
+    const payload: MessengerPayload = {
+      recipient: {
+        id,
+      },
+      sender_action: senderAction,
+    }
+
+    return this.sendToFB(id, payload);
   }
 }
