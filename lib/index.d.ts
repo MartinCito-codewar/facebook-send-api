@@ -58,4 +58,6 @@ export default class FBMessenger {
     sendTextMessage(id: string, text: string): Promise<MessengerResponse>;
     sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>): Promise<MessengerResponse>;
     sendSenderAction(id: string, senderAction: string): Promise<MessengerResponse>;
+    sendTypingIndicators(id: string): Promise<MessengerResponse>;
+    sendReadReceipt(id: string): Promise<MessengerResponse>;
 }

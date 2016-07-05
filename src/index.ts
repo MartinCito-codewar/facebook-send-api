@@ -102,7 +102,7 @@ export default class FBMessenger {
     if (elements.length > 10) {
       throw new Error('Too many elements');
     }
-    
+
     //title has length max of 80
     //subtitle has length max of 80
     //buttons is limited to 3
@@ -163,5 +163,13 @@ export default class FBMessenger {
     }
 
     return this.sendToFB(id, payload);
+  }
+
+  public sendTypingIndicators(id: string) {
+    return this.sendSenderAction(id, 'typing_on');
+  }
+
+  public sendReadReceipt(id: string) {
+    return this.sendSenderAction(id, 'mark_seen');
   }
 }
