@@ -1,4 +1,4 @@
-import fb from './index';
+import fb from 'facebook-send-api';
 const program = require('commander');
 let FBPlatform = null;
 
