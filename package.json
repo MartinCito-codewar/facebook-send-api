@@ -1,10 +1,10 @@
 {
   "name": "facebook-send-api",
   "version": "2.0.0",
-  "description": "Promise based module to speak to the facebook send api",
+  "description": "Promise based module to speak to the facebook send api for the messenger platform",
   "main": "lib/index.js",
   "bin": {
-    "sendapi": "./cli.js"
+    "sendapi": "lib/cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
