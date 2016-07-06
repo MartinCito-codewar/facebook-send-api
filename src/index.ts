@@ -85,7 +85,7 @@ interface MessengerSettings {
   },
 }
 
-const FBGraphURL = 'https://graph.facebook.com/v2.6/me/';
+const FBGraphURL = 'https://graph.facebook.com/v2.6/me';
 
 export default class FBMessenger {
   private token: string;
