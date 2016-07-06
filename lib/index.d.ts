@@ -75,4 +75,6 @@ export default class FBMessenger {
     setGetStartedPostback(payload: string): Promise<any>;
     setPersistentMenu(buttons: Array<MessengerButton>): Promise<any>;
     setGreetingText(text: string): Promise<any>;
+    createPostbackButton(title: string, payload: string): MessengerButton;
+    createWebButton(title: string, url: string): MessengerButton;
 }

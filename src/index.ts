@@ -250,4 +250,22 @@ export default class FBMessenger {
 
     return this.sendSettingsToFB(messengerPayload);
   }
+
+  public createPostbackButton(title: string, payload: string): MessengerButton {
+    const button: MessengerButton = {
+      type: 'postback',
+      title,
+      payload,
+    }
+    return button;
+  }
+
+  public createWebButton(title: string, url: string): MessengerButton {
+    const button: MessengerButton = {
+      type: 'web_url',
+      title,
+      url,
+    };
+    return button;
+  }
 }
