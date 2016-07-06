@@ -70,6 +70,7 @@ export default class FBMessenger {
     sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>): Promise<MessengerResponse>;
     sendSenderAction(id: string, senderAction: string): Promise<MessengerResponse>;
     sendTypingIndicators(id: string): Promise<MessengerResponse>;
+    sendCancelTypingIndicators(id: string): Promise<MessengerResponse>;
     sendReadReceipt(id: string): Promise<MessengerResponse>;
     private sendSettingsToFB(payload);
     setGetStartedPostback(payload: string): Promise<any>;

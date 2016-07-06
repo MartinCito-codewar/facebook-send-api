@@ -196,6 +196,10 @@ export default class FBMessenger {
     return this.sendSenderAction(id, 'typing_on');
   }
 
+  public sendCancelTypingIndicators(id: string) {
+    return this.sendSenderAction(id, 'typing_off');
+  }
+
   public sendReadReceipt(id: string) {
     return this.sendSenderAction(id, 'mark_seen');
   }
