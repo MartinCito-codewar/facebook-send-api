@@ -59,19 +59,50 @@ export interface MessengerError {
         fbtrace_id: string;
     };
 }
-export default class FBMessenger {
+export declare class FBMessage {
+    platform: FBPlatform;
+    id: string;
+    messageTitle: string;
+    messageSubTitle: string;
+    buttons: Array<MessengerButton>;
+    image_url: string;
+    elements: Array<MessengerItem>;
+    constructor(platform: FBPlatform, id: string);
+    title(title: string): this;
+    subtitle(sutitle: string): this;
+    postbackButton(text: string, postback: string): this;
+    webButton(text: string, url: string): this;
+    image(url: string): this;
+    element(anElement: MessengerItem | FBElement): this;
+}
+export declare class FBElement extends FBMessage {
+    create(): MessengerItem;
+}
+export declare class FBButtonMessage extends FBMessage {
+    send(): Promise<MessengerResponse> | FBButtonMessage;
+}
+export declare class FBGenericMessage extends FBMessage {
+    send(): Promise<any>;
+}
+export declare class FBTextMessage extends FBMessage {
+    send(): Promise<any>;
+}
+export declare class FBButton extends FBMessage {
+    create(): Array<MessengerButton>;
+}
+export default class FBPlatform {
     private token;
     constructor(token: string);
-    private sendToFB(id, payload);
-    sendMessageToFB(id: string, message: MessengerMessage): Promise<MessengerResponse>;
-    sendGenericMessage(id: string, elements: Array<MessengerItem>): Promise<MessengerResponse>;
-    sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton>): Promise<MessengerResponse>;
-    sendTextMessage(id: string, text: string): Promise<MessengerResponse>;
-    sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>): Promise<MessengerResponse>;
-    sendSenderAction(id: string, senderAction: string): Promise<MessengerResponse>;
-    sendTypingIndicators(id: string): Promise<MessengerResponse>;
-    sendCancelTypingIndicators(id: string): Promise<MessengerResponse>;
-    sendReadReceipt(id: string): Promise<MessengerResponse>;
+    private sendToFB(payload, path);
+    sendMessageToFB(id: string, message: MessengerMessage): Promise<any>;
+    sendGenericMessage(id: string, elements: Array<MessengerItem>): Promise<any>;
+    sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton>): Promise<MessengerResponse> | FBButtonMessage;
+    sendTextMessage(id: string, text: string): Promise<any>;
+    sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>): Promise<any>;
+    sendSenderAction(id: string, senderAction: string): Promise<any>;
+    sendTypingIndicators(id: string): Promise<any>;
+    sendCancelTypingIndicators(id: string): Promise<any>;
+    sendReadReceipt(id: string): Promise<any>;
     private sendSettingsToFB(payload);
     setGetStartedPostback(payload: string): Promise<any>;
     setPersistentMenu(buttons: Array<MessengerButton>): Promise<any>;
