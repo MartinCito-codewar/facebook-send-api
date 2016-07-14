@@ -88,13 +88,13 @@ interface MessengerSettings {
 const FBGraphURL = 'https://graph.facebook.com/v2.6/me';
 
 export class FBMessage {
-  public platform: FBPlatform;
-  public id: string;
-  public messageTitle: string;
-  public messageSubTitle: string;
-  public buttons: Array<MessengerButton>;
-  public image_url: string;
-  public elements: Array<MessengerItem>;
+  protected platform: FBPlatform;
+  protected id: string;
+  protected messageTitle: string;
+  protected messageSubTitle: string;
+  protected buttons: Array<MessengerButton>;
+  protected image_url: string;
+  protected elements: Array<MessengerItem>;
 
   constructor(platform: FBPlatform, id: string) {
     this.platform = platform;
@@ -175,13 +175,28 @@ export class FBButton extends FBMessage {
   }
 }
 
+export class FBQuickReplies extends FBMessage {
+  public send() {
+    const postbackButtons: Array<MessengerButton> = this.buttons.filter(button => button.type === 'postback');
+    const quickReplies: Array<MessengerQuickReply> = postbackButtons.map(button => {
+      const quickReply: MessengerQuickReply = {
+        content_type: 'text',
+        title: button.title,
+        payload: button.payload,
+      };
+      return quickReply;
+    })
+    return this.platform.sendQuickReplies(this.id, this.messageTitle, quickReplies);
+  }
+}
+
 export default class FBPlatform {
-  private token: string;
+  protected token: string;
   constructor(token: string) {
     this.token = token;
   }
 
-  private sendToFB(payload: MessengerPayload | MessengerSettings, path: string) {
+  private sendToFB(payload: MessengerPayload | MessengerSettings, path: string): Promise<MessengerResponse> {
     if (process.env.NODE_ENV === 'development') {
       console.log(`${JSON.stringify(payload)}`);
       return Promise.resolve(null);
@@ -213,6 +228,10 @@ export default class FBPlatform {
     return this.sendToFB(mesengerPayload, '/messages');
   }
 
+  public createGenericMessage(id: string): FBGenericMessage {
+    return new FBGenericMessage(this, id);
+  }
+
   public sendGenericMessage(id: string, elements: Array<MessengerItem>) {
     const maxElements = 10;
     if (elements.length > maxElements) {
@@ -235,11 +254,11 @@ export default class FBPlatform {
     return this.sendMessageToFB(id, messageData);
   }
 
-  public sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton>): Promise<MessengerResponse> | FBButtonMessage {
-    if (typeof text === 'undefined' || typeof buttons === 'undefined') {
-      return new FBButtonMessage(this, id);
-    }
+  public createButtonMessage(id: string): FBButtonMessage {
+    return new FBButtonMessage(this, id);
+  }
 
+  public sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton>) {
     let mebuttons = buttons;
     if (typeof buttons === typeof FBButton) {
 
@@ -263,12 +282,20 @@ export default class FBPlatform {
     return this.sendMessageToFB(id, messageData);
   }
 
+  public createTextMessage(id: string): FBTextMessage {
+    return new FBTextMessage(this, id);
+  }
+
   public sendTextMessage(id: string, text: string) {
     const messageData: MessengerMessage = {
       text,
     };
 
     return this.sendMessageToFB(id, messageData);
+  }
+
+  public createQuickReplies(id: string) {
+    return new FBQuickReplies(this, id);
   }
 
   public sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>) {
