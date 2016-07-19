@@ -199,7 +199,10 @@ export default class FBPlatform {
   private sendToFB(payload: MessengerPayload | MessengerSettings, path: string): Promise<MessengerResponse> {
     if (process.env.NODE_ENV === 'development') {
       console.log(`${JSON.stringify(payload)}`);
-      return Promise.resolve(null);
+      return Promise.resolve({
+        recipient_id: '0',
+        message_id: '0',
+      });
     }
 
     const requstPayload = {
@@ -258,14 +261,19 @@ export default class FBPlatform {
     return new FBButtonMessage(this, id);
   }
 
-  public sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton>) {
-    let mebuttons = buttons;
-    if (typeof buttons === typeof FBButton) {
+  public sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton> | FBButton) {
+    let theButtons:Array<MessengerButton> = null;
 
+    console.log('buttons:', typeof buttons);
+    if (typeof buttons === typeof FBButton) {
+      const asAButton: FBButton = buttons as FBButton;
+      theButtons = asAButton.create();
+    } else {
+      theButtons = buttons as Array<MessengerButton>;
     }
 
     const maxButtons = 3;
-    if (buttons.length > maxButtons) {
+    if (theButtons.length > maxButtons) {
       throw new Error('Too many buttons');
     }
 
@@ -275,7 +283,7 @@ export default class FBPlatform {
         'payload': {
           'template_type': 'button',
           text,
-          buttons: buttons.slice(0, maxButtons),
+          buttons: theButtons.slice(0, maxButtons),
         },
       },
     };

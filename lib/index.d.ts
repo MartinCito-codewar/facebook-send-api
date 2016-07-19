@@ -101,7 +101,7 @@ export default class FBPlatform {
     createGenericMessage(id: string): FBGenericMessage;
     sendGenericMessage(id: string, elements: Array<MessengerItem>): Promise<MessengerResponse>;
     createButtonMessage(id: string): FBButtonMessage;
-    sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton>): Promise<MessengerResponse>;
+    sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton> | FBButton): Promise<MessengerResponse>;
     createTextMessage(id: string): FBTextMessage;
     sendTextMessage(id: string, text: string): Promise<MessengerResponse>;
     createQuickReplies(id: string): FBQuickReplies;
