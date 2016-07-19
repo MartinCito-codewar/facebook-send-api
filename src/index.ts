@@ -179,13 +179,8 @@ export class FBQuickReplies extends FBMessage {
   public send() {
     const postbackButtons: Array<MessengerButton> = this.buttons.filter(button => button.type === 'postback');
     const quickReplies: Array<MessengerQuickReply> = postbackButtons.map(button => {
-      const quickReply: MessengerQuickReply = {
-        content_type: 'text',
-        title: button.title,
-        payload: button.payload,
-      };
-      return quickReply;
-    })
+      return this.platform.createQuickReply(button.title, button.payload);
+    });
     return this.platform.sendQuickReplies(this.id, this.messageTitle, quickReplies);
   }
 }
@@ -394,6 +389,15 @@ export default class FBPlatform {
       title,
       url,
     };
+    return button;
+  }
+
+  public createQuickReply(title: string, payload: string): MessengerQuickReply{
+    const button: MessengerQuickReply = {
+      content_type: 'text',
+      title,
+      payload,
+    }
     return button;
   }
 }
