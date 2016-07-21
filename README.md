@@ -1,7 +1,9 @@
 # facebook-send-api
-typescript &amp; promise based modile for facebook's messenger send api. Currently used in production by [fynd](https://fynd.me) for [fyndbot](https://m.me/shopfynd).
+Typescript &amp; promise based module for facebook's [messenger send api](https://developers.facebook.com/docs/messenger-platform/send-api-reference). 
 
-# installation
+Currently used in production by [fynd.me](https://fynd.me) for [fyndbot](https://m.me/shopfynd).
+
+# Installation
 ````bash
 npm install --save facebook-send-api
 ````
