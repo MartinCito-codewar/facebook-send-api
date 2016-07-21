@@ -217,7 +217,7 @@ export default class FBPlatform {
     }
 
     const requstPayload = {
-      url: `${FBGraphURL}/messages`,
+      url: `${FBGraphURL}${path}`,
       qs: { access_token: this.token },
       method: 'POST',
       json: payload,
