@@ -249,7 +249,7 @@ export default class FBPlatform {
   public sendGenericMessage(id: string, elements: Array<MessengerItem>) {
     const maxElements = 10;
     if (elements.length > maxElements) {
-      throw new Error('Too many elements');
+      throw new Error(`Sending too many elements, max is ${maxElements}, tried sending ${elements.length}`);
     }
 
     //title has length max of 80
@@ -285,7 +285,7 @@ export default class FBPlatform {
 
     const maxButtons = 3;
     if (theButtons.length > maxButtons) {
-      throw new Error('Too many buttons');
+      throw new Error(`Sending too many buttons, max is ${maxButtons}, tried sending ${theButtons.length}`);
     }
 
     const messageData: MessengerMessage = {
@@ -318,13 +318,14 @@ export default class FBPlatform {
   }
 
   public sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>) {
-    if (quickReplies.length > 10) {
-      throw new Error('Quick replies limited to 10');
+    const maxQuickReplies = 10;
+    if (quickReplies.length > maxQuickReplies) {
+      throw new Error(`Quick replies limited to ${maxQuickReplies}, tried sending ${quickReplies.length}`);
     }
 
     const messageData: MessengerMessage = {
       text,
-      quick_replies: quickReplies,
+      quick_replies: quickReplies.slice(0, maxQuickReplies),
     }
 
     return this.sendMessageToFB(id, messageData);
