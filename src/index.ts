@@ -146,8 +146,8 @@ export class FBMessage {
 }
 
 export class FBElement extends FBMessage {
-  constructor() {
-    super(null, null);
+  constructor(platform: FBPlatform = new FBPlatform(null)) {
+    super(platform, null);
     return this;
   }
   public create():MessengerItem  {

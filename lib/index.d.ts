@@ -77,7 +77,7 @@ export declare class FBMessage {
     element(anElement: MessengerItem | FBElement): this;
 }
 export declare class FBElement extends FBMessage {
-    constructor();
+    constructor(platform?: FBPlatform);
     create(): MessengerItem;
 }
 export declare class FBButtonMessage extends FBMessage {
