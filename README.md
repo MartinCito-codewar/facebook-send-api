@@ -6,14 +6,16 @@ typescript &amp; promise based modile for facebook's messenger send api
 npm install --save facebook-send-api
 ````
 
-# usage
+# Singular usage
 ````typescript
 const token = 'xxx';
 import fb from 'facebook-send-api';
 const FBPlatform = new fb(token);
+const RESET_SEARCH = 'RESET';
+const RESET_CANCEL = 'CANCEL';
 
 FBPlatform.sendTextMessage(sender.id, 'hello');
-FBPlatform.sendButtonMessage((sender.id, 'title', [{
+FBPlatform.sendButtonMessage(sender.id, 'title', [{
     type: 'postback',
     title: 'reset'),
     payload: RESET_SEARCH,
@@ -23,5 +25,23 @@ FBPlatform.sendButtonMessage((sender.id, 'title', [{
     title: 'cancel'),
     payload: RESET_CANEL,
   }]);
-FBPlatform.sendGenericMessage(sender.id, elements))
+````
+
+# Chained usage
+````typescript
+const token = 'xxx';
+import fb from 'facebook-send-api';
+const FBPlatform = new fb(token);
+const RESET_SEARCH = 'RESET';
+const RESET_CANCEL = 'CANCEL';
+
+FBPlatform.createTextMessage(sender.id)
+    .text('hello')
+    .send();
+
+FBPlatform.createButtonMessage(sender.id)
+    .title('title');
+    .postbackButton('reset', RESET_SEARCH)
+    .postbackButton('cancel', RESET_CANEL)
+    .send();
 ````
