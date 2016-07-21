@@ -109,6 +109,11 @@ export class FBMessage {
     return this;
   }
 
+  public text(text: string) {
+    this.messageTitle = text;
+    return this;
+  }
+
   public subtitle(sutitle: string) {
     this.messageSubTitle = sutitle;
     return this;
@@ -141,6 +146,10 @@ export class FBMessage {
 }
 
 export class FBElement extends FBMessage {
+  constructor() {
+    super(null, null);
+    return this;
+  }
   public create():MessengerItem  {
     let element:any = {};
     if (this.messageTitle) element.title = this.messageTitle;
@@ -158,10 +167,6 @@ export class FBButtonMessage extends FBMessage {
 }
 
 export class FBGenericMessage extends FBMessage {
-  public text(text: string) {
-    this.messageTitle = text;
-    return this;
-  }
   public send() {
     return this.platform.sendGenericMessage(this.id, this.elements);
   }

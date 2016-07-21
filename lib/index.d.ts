@@ -69,6 +69,7 @@ export declare class FBMessage {
     protected elements: Array<MessengerItem>;
     constructor(platform: FBPlatform, id: string);
     title(title: string): this;
+    text(text: string): this;
     subtitle(sutitle: string): this;
     postbackButton(text: string, postback: string): this;
     webButton(text: string, url: string): this;
@@ -76,13 +77,13 @@ export declare class FBMessage {
     element(anElement: MessengerItem | FBElement): this;
 }
 export declare class FBElement extends FBMessage {
+    constructor();
     create(): MessengerItem;
 }
 export declare class FBButtonMessage extends FBMessage {
     send(): Promise<MessengerResponse>;
 }
 export declare class FBGenericMessage extends FBMessage {
-    text(text: string): this;
     send(): Promise<MessengerResponse>;
 }
 export declare class FBTextMessage extends FBMessage {
