@@ -325,7 +325,7 @@ export default class FBPlatform {
 
     const messageData: MessengerMessage = {
       text,
-      quick_replies: quickReplies.slice(0, maxQuickReplies),
+      quick_replies: quickReplies,
     }
 
     return this.sendMessageToFB(id, messageData);
