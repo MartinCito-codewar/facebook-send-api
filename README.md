@@ -1,5 +1,5 @@
 # facebook-send-api
-typescript &amp; promise based modile for facebook's messenger send api
+typescript &amp; promise based modile for facebook's messenger send api. Currently used in production by [fynd](https://fynd.me) for [fyndbot](https://m.me/shopfynd).
 
 # installation
 ````bash
