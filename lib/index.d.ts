@@ -96,7 +96,9 @@ export declare class FBQuickReplies extends FBMessage {
 }
 export default class FBPlatform {
     protected token: string;
+    protected sendInDevelopment: boolean;
     constructor(token: string);
+    turnOnSendingInDevelopment(state?: boolean): this;
     private sendToFB(payload, path);
     sendMessageToFB(id: string, message: MessengerMessage): Promise<MessengerResponse>;
     createGenericMessage(id: string): FBGenericMessage;

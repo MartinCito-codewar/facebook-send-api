@@ -191,12 +191,19 @@ export class FBQuickReplies extends FBMessage {
 
 export default class FBPlatform {
   protected token: string;
+  protected sendInDevelopment: boolean;
   constructor(token: string) {
     this.token = token;
+    this.sendInDevelopment = false;
+  }
+
+  public turnOnSendingInDevelopment(state: boolean = true) {
+    this.sendInDevelopment = state;
+    return this;
   }
 
   private sendToFB(payload: MessengerPayload | MessengerSettings, path: string): Promise<MessengerResponse> {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && this.sendInDevelopment === false) {
       console.log(`${JSON.stringify(payload)}`);
       return Promise.resolve({
         recipient_id: '0',
