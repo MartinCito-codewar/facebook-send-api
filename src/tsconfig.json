@@ -12,7 +12,6 @@
     ],
     "files": [
       "typings/index.d.ts",
-      "index.ts",
-      "cli.ts"
+      "index.ts"
     ]
 }

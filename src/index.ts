@@ -158,6 +158,10 @@ export class FBButtonMessage extends FBMessage {
 }
 
 export class FBGenericMessage extends FBMessage {
+  public text(text: string) {
+    this.messageTitle = text;
+    return this;
+  }
   public send() {
     return this.platform.sendGenericMessage(this.id, this.elements);
   }

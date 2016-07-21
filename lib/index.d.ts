@@ -82,6 +82,7 @@ export declare class FBButtonMessage extends FBMessage {
     send(): Promise<MessengerResponse>;
 }
 export declare class FBGenericMessage extends FBMessage {
+    text(text: string): this;
     send(): Promise<MessengerResponse>;
 }
 export declare class FBTextMessage extends FBMessage {
