@@ -99,11 +99,14 @@ export default class FBPlatform {
     protected token: string;
     protected sendInDevelopment: boolean;
     protected validateLimits: boolean;
+    maxElements: number;
+    maxButtons: number;
+    maxQuickReplies: number;
     constructor(token: string);
     turnOnSendingInDevelopment(state?: boolean): this;
     turnOnValidation(state?: boolean): this;
     private sendToFB(payload, path);
-    sendMessageToFB(id: string, message: MessengerMessage): Promise<MessengerResponse>;
+    sendMessageToFB(id: string, message: MessengerMessage, notification_type?: string): Promise<MessengerResponse>;
     createGenericMessage(id: string): FBGenericMessage;
     sendGenericMessage(id: string, elements: Array<MessengerItem>): Promise<MessengerResponse>;
     createButtonMessage(id: string): FBButtonMessage;

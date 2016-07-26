@@ -196,12 +196,14 @@ export class FBQuickReplies extends FBMessage {
 
 export default class FBPlatform {
   protected token: string;
-  protected sendInDevelopment: boolean;
-  protected validateLimits: boolean;
+  protected sendInDevelopment: boolean = false;
+  protected validateLimits: boolean = false
+  public maxElements: number = 10;
+  public maxButtons: number = 3;
+  public maxQuickReplies: number = 10;
+
   constructor(token: string) {
     this.token = token;
-    this.sendInDevelopment = false;
-    this.validateLimits = false;
   }
 
   public turnOnSendingInDevelopment(state: boolean = true) {
@@ -240,10 +242,11 @@ export default class FBPlatform {
       })
   }
 
-  public sendMessageToFB(id: string, message:MessengerMessage) {
+  public sendMessageToFB(id: string, message: MessengerMessage, notification_type: string = 'REGULAR') {
     const mesengerPayload: MessengerPayload = {
       recipient: { id },
       message,
+      notification_type,
     };
 
     return this.sendToFB(mesengerPayload, '/messages');
@@ -254,9 +257,8 @@ export default class FBPlatform {
   }
 
   public sendGenericMessage(id: string, elements: Array<MessengerItem>) {
-    const maxElements = 10;
-    if (elements.length > maxElements && this.validateLimits) {
-      throw new Error(`Sending too many elements, max is ${maxElements}, tried sending ${elements.length}`);
+    if (elements.length > this.maxElements && this.validateLimits) {
+      throw new Error(`Sending too many elements, max is ${this.maxElements}, tried sending ${elements.length}`);
     }
 
     //title has length max of 80
@@ -268,7 +270,7 @@ export default class FBPlatform {
         'type': 'template',
         'payload': {
           'template_type': 'generic',
-          elements: elements.slice(0, maxElements),
+          elements: elements.slice(0, this.maxElements),
         },
       },
     };
@@ -290,9 +292,8 @@ export default class FBPlatform {
       theButtons = buttons as Array<MessengerButton>;
     }
 
-    const maxButtons = 3;
-    if (theButtons.length > maxButtons && this.validateLimits) {
-      throw new Error(`Sending too many buttons, max is ${maxButtons}, tried sending ${theButtons.length}`);
+    if (theButtons.length > this.maxButtons && this.validateLimits) {
+      throw new Error(`Sending too many buttons, max is ${this.maxButtons}, tried sending ${theButtons.length}`);
     }
 
     const messageData: MessengerMessage = {
@@ -301,7 +302,7 @@ export default class FBPlatform {
         'payload': {
           'template_type': 'button',
           text,
-          buttons: theButtons.slice(0, maxButtons),
+          buttons: theButtons.slice(0, this.maxButtons),
         },
       },
     };
@@ -325,14 +326,13 @@ export default class FBPlatform {
   }
 
   public sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>) {
-    const maxQuickReplies = 10;
-    if (quickReplies.length > maxQuickReplies && this.validateLimits) {
-      throw new Error(`Quick replies limited to ${maxQuickReplies}, tried sending ${quickReplies.length}`);
+    if (quickReplies.length > this.maxQuickReplies && this.validateLimits) {
+      throw new Error(`Quick replies limited to ${this.maxQuickReplies}, tried sending ${quickReplies.length}`);
     }
 
     const messageData: MessengerMessage = {
       text,
-      quick_replies: quickReplies.slice(0, maxQuickReplies),
+      quick_replies: quickReplies.slice(0, this.maxQuickReplies),
     }
 
     return this.sendMessageToFB(id, messageData);
