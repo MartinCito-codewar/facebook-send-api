@@ -20,13 +20,13 @@ const THIRD = 'THIRD';
 
 FBPlatform.setGreetingText('hello');
 FBPlatform.setGetStartedPostback(GET_STARTED_POSTBACK);
-FBPlatform.setPersistentMenu([
+FBPlatform.setPersistentMenu([  
     {
-        type: 'postback',
+        type: 'postback',   // create a button yourself
         title: '1'),
         payload: FIRST,
     },
-    FBPlatform.createPostbackButton('2', SECOND),
+    FBPlatform.createPostbackButton('2', SECOND),   //or use the libraries helper function
     FBPlatform.createPostbackButton('3', THIRD),
 ]);
 ````
