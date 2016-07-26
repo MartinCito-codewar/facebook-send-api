@@ -11,7 +11,12 @@
   "keywords": [
     "facebook",
     "messenger",
-    "send api"
+    "send api",
+    "typescript",
+    "promise",
+    "fb",
+    "bot",
+    "chatbot"
   ],
   "author": "Adam Juhasz",
   "license": "MIT",
