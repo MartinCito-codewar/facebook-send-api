@@ -20,13 +20,13 @@ const THIRD = 'THIRD';
 
 FBPlatform.setGreetingText('hello');
 FBPlatform.setGetStartedPostback(GET_STARTED_POSTBACK);
-FBPlatform.setPersistentMenu([
+FBPlatform.setPersistentMenu([  
     {
-        type: 'postback',
+        type: 'postback',   // create a button yourself
         title: '1'),
         payload: FIRST,
     },
-    FBPlatform.createPostbackButton('2', SECOND),
+    FBPlatform.createPostbackButton('2', SECOND),   //or use the libraries helper function
     FBPlatform.createPostbackButton('3', THIRD),
 ]);
 ````
@@ -41,7 +41,13 @@ const RESET_CANCEL = 'CANCEL';
 const sender = { id: '0' };
 
 // a simple text message of 'hello'
-FBPlatform.sendTextMessage(sender.id, 'hello');
+FBPlatform.sendTextMessage(sender.id, 'hello')
+    .then(() => {
+        console.log('message sent');
+    })
+    .catch(() => {
+        return FBPlatform.sendTextMessage('uh oh, bot error');
+    });
 
 // a button message with 3 buttons using both an object and the libraries helper functions
 FBPlatform.sendButtonMessage(sender.id, 'title', [{
