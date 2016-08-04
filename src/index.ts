@@ -194,6 +194,8 @@ export class FBQuickReplies extends FBMessage {
   }
 }
 
+export type LoggerFunction = (payload: MessengerPayload) => Promise<void>;
+
 export default class FBPlatform {
   protected token: string;
   protected sendInDevelopment: boolean = false;
@@ -201,6 +203,7 @@ export default class FBPlatform {
   public maxElements: number = 10;
   public maxButtons: number = 3;
   public maxQuickReplies: number = 10;
+  public loggingFunction: LoggerFunction = null;
 
   constructor(token: string) {
     this.token = token;
@@ -249,7 +252,12 @@ export default class FBPlatform {
       notification_type,
     };
 
-    return this.sendToFB(mesengerPayload, '/messages');
+    let promise = Promise.resolve(null);
+    if (this.loggingFunction) {
+      promise = this.loggingFunction(mesengerPayload);
+    }
+
+    return promise.then(() => this.sendToFB(mesengerPayload, '/messages'));
   }
 
   public createGenericMessage(id: string): FBGenericMessage {
