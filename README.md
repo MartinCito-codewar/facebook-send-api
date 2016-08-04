@@ -31,7 +31,7 @@ FBPlatform.setPersistentMenu([
 ]);
 ````
 
-# Singular usage
+#  Usage
 ````typescript
 const token = 'xxx';
 import fb from 'facebook-send-api';
