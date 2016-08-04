@@ -95,6 +95,7 @@ export declare class FBButton extends FBMessage {
 export declare class FBQuickReplies extends FBMessage {
     send(): Promise<MessengerResponse>;
 }
+export declare type LoggerFunction = (payload: MessengerPayload) => Promise<void>;
 export default class FBPlatform {
     protected token: string;
     protected sendInDevelopment: boolean;
@@ -102,6 +103,7 @@ export default class FBPlatform {
     maxElements: number;
     maxButtons: number;
     maxQuickReplies: number;
+    loggingFunction: LoggerFunction;
     constructor(token: string);
     turnOnSendingInDevelopment(state?: boolean): this;
     turnOnValidation(state?: boolean): this;
