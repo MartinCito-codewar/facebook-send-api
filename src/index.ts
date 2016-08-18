@@ -72,6 +72,15 @@ export interface MessengerError {
   },
 }
 
+export interface FacebookUser {
+  first_name: string;
+  last_name: string;
+  profile_pic: string;
+  locale: string;
+  timezone: number;
+  gender: string;
+}
+
 interface MessengerPostback {
   payload: string,
 }
@@ -431,5 +440,10 @@ export default class FBPlatform {
       payload,
     }
     return button;
+  }
+
+  public getUserProfile(id: string): Promise<FacebookUser> {
+    return rp(`https://graph.facebook.com/v2.6/${id}?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=${this.token}`)
+      .then((response: string) => JSON.parse(response) as FacebookUser);
   }
 }

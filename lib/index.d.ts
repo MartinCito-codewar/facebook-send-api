@@ -59,6 +59,14 @@ export interface MessengerError {
         fbtrace_id: string;
     };
 }
+export interface FacebookUser {
+    first_name: string;
+    last_name: string;
+    profile_pic: string;
+    locale: string;
+    timezone: number;
+    gender: string;
+}
 export declare class FBMessage {
     protected platform: FBPlatform;
     protected id: string;
@@ -128,4 +136,5 @@ export default class FBPlatform {
     createPostbackButton(title: string, payload: string): MessengerButton;
     createWebButton(title: string, url: string): MessengerButton;
     createQuickReply(title: string, payload: string): MessengerQuickReply;
+    getUserProfile(id: string): Promise<FacebookUser>;
 }
