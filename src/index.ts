@@ -1,5 +1,6 @@
 import * as Promise from 'bluebird';
 import * as rp from 'request-promise';
+import * as util from 'util';
 
 export interface MessengerQuickReply {
   content_type: string,
@@ -94,7 +95,7 @@ interface MessengerSettings {
   },
 }
 
-const FBGraphURL = 'https://graph.facebook.com/v2.6/me';
+const DefaultFBGraphURL = process.env.FBGRAPHURL || 'https://graph.facebook.com/v2.6';
 
 export class FBMessage {
   protected platform: FBPlatform;
@@ -213,9 +214,15 @@ export default class FBPlatform {
   public maxButtons: number = 3;
   public maxQuickReplies: number = 10;
   public loggingFunction: LoggerFunction = null;
+  private FBGraphURL: string;
 
-  constructor(token: string) {
+  constructor(token: string, graphURL: string = DefaultFBGraphURL) {
     this.token = token;
+    this.FBGraphURL = graphURL;
+  }
+
+  public setGraphURL(graphURL: string) {
+    this.FBGraphURL = graphURL;
   }
 
   public turnOnSendingInDevelopment(state: boolean = true) {
@@ -238,7 +245,7 @@ export default class FBPlatform {
     }
 
     const requstPayload = {
-      url: `${FBGraphURL}${path}`,
+      url: `${this.FBGraphURL}/me${path}`,
       qs: { access_token: this.token },
       method: 'POST',
       json: payload,
@@ -256,7 +263,7 @@ export default class FBPlatform {
 
   public sendMessageToFB(id: string, message: MessengerMessage, notification_type: string = 'REGULAR') {
     const mesengerPayload: MessengerPayload = {
-      recipient: { id },
+      recipient: { id: id.toString() },
       message,
       notification_type,
     };
@@ -358,7 +365,7 @@ export default class FBPlatform {
   public sendSenderAction(id: string, senderAction: string) {
     const payload: MessengerPayload = {
       recipient: {
-        id,
+        id: id.toString(),
       },
       sender_action: senderAction,
     }
@@ -443,7 +450,7 @@ export default class FBPlatform {
   }
 
   public getUserProfile(id: string): Promise<FacebookUser> {
-    return rp(`https://graph.facebook.com/v2.6/${id}?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=${this.token}`)
+    return rp(`${this.FBGraphURL}/${id}?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=${this.token}`)
       .then((response: string) => JSON.parse(response) as FacebookUser);
   }
 }

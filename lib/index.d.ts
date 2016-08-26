@@ -112,7 +112,9 @@ export default class FBPlatform {
     maxButtons: number;
     maxQuickReplies: number;
     loggingFunction: LoggerFunction;
-    constructor(token: string);
+    private FBGraphURL;
+    constructor(token: string, graphURL?: string);
+    setGraphURL(graphURL: string): void;
     turnOnSendingInDevelopment(state?: boolean): this;
     turnOnValidation(state?: boolean): this;
     private sendToFB(payload, path);
