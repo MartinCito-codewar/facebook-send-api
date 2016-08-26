@@ -251,6 +251,8 @@ export default class FBPlatform {
       json: payload,
     };
 
+    // console.log('requstPayload', util.inspect(requstPayload, { depth: null }));
+
     return rp(requstPayload)
       .then((body) => {
         if (body.error) {
