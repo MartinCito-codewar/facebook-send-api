@@ -261,6 +261,10 @@ export default class FBPlatform {
         }
         return body;
       })
+      .catch(err => {
+        console.log('requstPayload', util.inspect(requstPayload, { depth: null }));
+        throw err;
+      });
   }
 
   public sendMessageToFB(id: string, message: MessengerMessage, notification_type: string = 'REGULAR') {
