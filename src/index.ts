@@ -49,14 +49,16 @@ export interface MessengerMessage {
   metadata?: string,
 }
 
+export type NotificationType = 'REGULAR' | 'SILENT_PUSH' | 'NO_PUSH';
+export type SenderAction = 'mark_seen' | 'typing_on' | 'typing_off';
 export interface MessengerPayload {
   recipient: {
-    id?: string,
-    phone_number?: string,
-  },
-  message?: MessengerMessage,
-  sender_action?: string,
-  notification_type?: string,
+    id?: string;
+    phone_number?: string;
+  };
+  message?: MessengerMessage;
+  sender_action?: SenderAction;
+  notification_type?: NotificationType;
 }
 
 export interface MessengerResponse {
@@ -186,6 +188,16 @@ export class FBTextMessage extends FBMessage {
   public send() {
     return this.platform.sendTextMessage(this.id, this.messageTitle);
   }
+  public export(): MessengerPayload {
+    return {
+      recipient: {
+        id: this.id,
+      },
+      message: {
+        text: this.messageTitle,
+      },
+    };
+  }
 }
 
 export class FBButton extends FBMessage {
@@ -235,6 +247,15 @@ export default class FBPlatform {
     return this;
   }
 
+  public wrapMessage(id: string, message: MessengerMessage, notification_type: NotificationType): MessengerPayload {
+    const mesengerPayload: MessengerPayload = {
+      recipient: { id: id.toString() },
+      message,
+      notification_type,
+    };
+    return mesengerPayload;
+  }
+
   private sendToFB(payload: MessengerPayload | MessengerSettings, path: string): Promise<MessengerResponse> {
     if (process.env.NODE_ENV === 'development' && this.sendInDevelopment === false) {
       console.log(`${JSON.stringify(payload)}`);
@@ -267,13 +288,8 @@ export default class FBPlatform {
       });
   }
 
-  public sendMessageToFB(id: string, message: MessengerMessage, notification_type: string = 'REGULAR') {
-    const mesengerPayload: MessengerPayload = {
-      recipient: { id: id.toString() },
-      message,
-      notification_type,
-    };
-
+  public sendMessageToFB(id: string, message: MessengerMessage, notification_type: NotificationType = 'REGULAR') {
+    const mesengerPayload = this.wrapMessage(id, message, notification_type);
     let promise = Promise.resolve(null);
     if (this.loggingFunction) {
       promise = this.loggingFunction(mesengerPayload);
@@ -286,15 +302,7 @@ export default class FBPlatform {
     return new FBGenericMessage(this, id);
   }
 
-  public sendGenericMessage(id: string, elements: Array<MessengerItem>) {
-    if (elements.length > this.maxElements && this.validateLimits) {
-      throw new Error(`Sending too many elements, max is ${this.maxElements}, tried sending ${elements.length}`);
-    }
-
-    //title has length max of 80
-    //subtitle has length max of 80
-    //buttons is limited to 3
-
+  public exportGenericMessage(elements: Array<MessengerItem>): MessengerMessage {
     const messageData: MessengerMessage = {
       'attachment': {
         'type': 'template',
@@ -304,14 +312,25 @@ export default class FBPlatform {
         },
       },
     };
-    return this.sendMessageToFB(id, messageData);
+    return messageData;
+  }
+
+  public sendGenericMessage(id: string, elements: Array<MessengerItem>) {
+    if (elements.length > this.maxElements && this.validateLimits) {
+      throw new Error(`Sending too many elements, max is ${this.maxElements}, tried sending ${elements.length}`);
+    }
+    //title has length max of 80
+    //subtitle has length max of 80
+    //buttons is limited to 3
+
+    return this.sendMessageToFB(id, this.exportGenericMessage(elements));
   }
 
   public createButtonMessage(id: string): FBButtonMessage {
     return new FBButtonMessage(this, id);
   }
 
-  public sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton> | FBButton) {
+  public exportButtonMessage(text: string, buttons: Array<MessengerButton> | FBButton): MessengerMessage {
     let theButtons:Array<MessengerButton> = null;
 
     console.log('buttons:', typeof buttons);
@@ -336,23 +355,38 @@ export default class FBPlatform {
         },
       },
     };
-    return this.sendMessageToFB(id, messageData);
+    return messageData;
+  }
+
+  public sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton> | FBButton) {
+    return this.sendMessageToFB(id, this.exportButtonMessage(text, buttons));
   }
 
   public createTextMessage(id: string): FBTextMessage {
     return new FBTextMessage(this, id);
   }
 
-  public sendTextMessage(id: string, text: string) {
+  public exportTextMessage(text: string): MessengerMessage {
     const messageData: MessengerMessage = {
       text,
     };
+    return messageData;
+  }
 
-    return this.sendMessageToFB(id, messageData);
+  public sendTextMessage(id: string, text: string) {
+    return this.sendMessageToFB(id, this.exportTextMessage(text));
   }
 
   public createQuickReplies(id: string) {
     return new FBQuickReplies(this, id);
+  }
+
+  public exportQuickReplies(text: string, quickReplies: Array<MessengerQuickReply>): MessengerMessage {
+    const messageData: MessengerMessage = {
+      text,
+      quick_replies: quickReplies.slice(0, this.maxQuickReplies),
+    };
+    return messageData;
   }
 
   public sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>) {
@@ -360,15 +394,10 @@ export default class FBPlatform {
       throw new Error(`Quick replies limited to ${this.maxQuickReplies}, tried sending ${quickReplies.length}`);
     }
 
-    const messageData: MessengerMessage = {
-      text,
-      quick_replies: quickReplies.slice(0, this.maxQuickReplies),
-    }
-
-    return this.sendMessageToFB(id, messageData);
+    return this.sendMessageToFB(id, this.exportQuickReplies(text, quickReplies));
   }
 
-  public sendSenderAction(id: string, senderAction: string) {
+  public sendSenderAction(id: string, senderAction: SenderAction) {
     const payload: MessengerPayload = {
       recipient: {
         id: id.toString(),
@@ -446,7 +475,7 @@ export default class FBPlatform {
     return button;
   }
 
-  public createQuickReply(title: string, payload: string): MessengerQuickReply{
+  public createQuickReply(title: string, payload: string): MessengerQuickReply {
     const button: MessengerQuickReply = {
       content_type: 'text',
       title,

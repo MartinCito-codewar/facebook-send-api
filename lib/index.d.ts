@@ -38,14 +38,16 @@ export interface MessengerMessage {
     quick_replies?: Array<MessengerQuickReply>;
     metadata?: string;
 }
+export declare type NotificationType = 'REGULAR' | 'SILENT_PUSH' | 'NO_PUSH';
+export declare type SenderAction = 'mark_seen' | 'typing_on' | 'typing_off';
 export interface MessengerPayload {
     recipient: {
         id?: string;
         phone_number?: string;
     };
     message?: MessengerMessage;
-    sender_action?: string;
-    notification_type?: string;
+    sender_action?: SenderAction;
+    notification_type?: NotificationType;
 }
 export interface MessengerResponse {
     recipient_id: string;
@@ -96,6 +98,7 @@ export declare class FBGenericMessage extends FBMessage {
 }
 export declare class FBTextMessage extends FBMessage {
     send(): Promise<MessengerResponse>;
+    export(): MessengerPayload;
 }
 export declare class FBButton extends FBMessage {
     create(): Array<MessengerButton>;
@@ -117,17 +120,22 @@ export default class FBPlatform {
     setGraphURL(graphURL: string): void;
     turnOnSendingInDevelopment(state?: boolean): this;
     turnOnValidation(state?: boolean): this;
+    wrapMessage(id: string, message: MessengerMessage, notification_type: NotificationType): MessengerPayload;
     private sendToFB(payload, path);
-    sendMessageToFB(id: string, message: MessengerMessage, notification_type?: string): Promise<MessengerResponse>;
+    sendMessageToFB(id: string, message: MessengerMessage, notification_type?: NotificationType): Promise<MessengerResponse>;
     createGenericMessage(id: string): FBGenericMessage;
+    exportGenericMessage(elements: Array<MessengerItem>): MessengerMessage;
     sendGenericMessage(id: string, elements: Array<MessengerItem>): Promise<MessengerResponse>;
     createButtonMessage(id: string): FBButtonMessage;
+    exportButtonMessage(text: string, buttons: Array<MessengerButton> | FBButton): MessengerMessage;
     sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton> | FBButton): Promise<MessengerResponse>;
     createTextMessage(id: string): FBTextMessage;
+    exportTextMessage(text: string): MessengerMessage;
     sendTextMessage(id: string, text: string): Promise<MessengerResponse>;
     createQuickReplies(id: string): FBQuickReplies;
+    exportQuickReplies(text: string, quickReplies: Array<MessengerQuickReply>): MessengerMessage;
     sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>): Promise<MessengerResponse>;
-    sendSenderAction(id: string, senderAction: string): Promise<MessengerResponse>;
+    sendSenderAction(id: string, senderAction: SenderAction): Promise<MessengerResponse>;
     sendTypingIndicators(id: string): Promise<MessengerResponse>;
     sendCancelTypingIndicators(id: string): Promise<MessengerResponse>;
     sendReadReceipt(id: string): Promise<MessengerResponse>;
