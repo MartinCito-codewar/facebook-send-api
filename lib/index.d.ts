@@ -1,83 +1,14 @@
 /// <reference types="bluebird" />
 import * as Promise from 'bluebird';
-export interface MessengerQuickReply {
-    content_type: string;
-    title: string;
-    payload: string;
-}
-export interface MessengerButton {
-    type: string;
-    title: string;
-    payload?: string;
-    url?: string;
-}
-export interface MessengerItem {
-    title: string;
-    subtitle?: string;
-    image_url?: string;
-    buttons?: Array<MessengerButton>;
-}
-export interface MessengerTextMessage {
-    text: string;
-}
-export interface MessengerGenericPayload {
-    template_type: string;
-    elements: Array<MessengerItem>;
-}
-export interface MessengerButtonPayload {
-    template_type: string;
-    text: string;
-    buttons: Array<MessengerButton>;
-}
-export interface MessengerAttachement {
-    type: string;
-    payload: MessengerGenericPayload | MessengerButtonPayload;
-}
-export interface MessengerMessage {
-    attachment?: MessengerAttachement;
-    text?: string;
-    quick_replies?: Array<MessengerQuickReply>;
-    metadata?: string;
-}
-export declare type NotificationType = 'REGULAR' | 'SILENT_PUSH' | 'NO_PUSH';
-export declare type SenderAction = 'mark_seen' | 'typing_on' | 'typing_off';
-export interface MessengerPayload {
-    recipient: {
-        id?: string;
-        phone_number?: string;
-    };
-    message?: MessengerMessage;
-    sender_action?: SenderAction;
-    notification_type?: NotificationType;
-}
-export interface MessengerResponse {
-    recipient_id: string;
-    message_id: string;
-}
-export interface MessengerError {
-    error: {
-        message: string;
-        type: string;
-        code: Number;
-        fbtrace_id: string;
-    };
-}
-export interface FacebookUser {
-    first_name: string;
-    last_name: string;
-    profile_pic: string;
-    locale: string;
-    timezone: number;
-    gender: string;
-}
+import * as FBTypes from 'facebook-sendapi-types';
 export declare class FBMessage {
     protected platform: FBPlatform;
     protected id: string;
     protected messageTitle: string;
     protected messageSubTitle: string;
-    protected buttons: Array<MessengerButton>;
+    protected buttons: Array<FBTypes.MessengerButton>;
     protected image_url: string;
-    protected elements: Array<MessengerItem>;
+    protected elements: Array<FBTypes.MessengerItem>;
     constructor(platform: FBPlatform, id: string);
     title(title: string): this;
     text(text: string): this;
@@ -85,29 +16,29 @@ export declare class FBMessage {
     postbackButton(text: string, postback: string): this;
     webButton(text: string, url: string): this;
     image(url: string): this;
-    element(anElement: MessengerItem | FBElement): this;
+    element(anElement: FBTypes.MessengerItem | FBElement): this;
 }
 export declare class FBElement extends FBMessage {
     constructor(platform?: FBPlatform);
-    create(): MessengerItem;
+    create(): FBTypes.MessengerItem;
 }
 export declare class FBButtonMessage extends FBMessage {
-    send(): Promise<MessengerResponse>;
+    send(): Promise<FBTypes.MessengerResponse>;
 }
 export declare class FBGenericMessage extends FBMessage {
-    send(): Promise<MessengerResponse>;
+    send(): Promise<FBTypes.MessengerResponse>;
 }
 export declare class FBTextMessage extends FBMessage {
-    send(): Promise<MessengerResponse>;
-    export(): MessengerPayload;
+    send(): Promise<FBTypes.MessengerResponse>;
+    export(): FBTypes.MessengerPayload;
 }
 export declare class FBButton extends FBMessage {
-    create(): Array<MessengerButton>;
+    create(): Array<FBTypes.MessengerButton>;
 }
 export declare class FBQuickReplies extends FBMessage {
-    send(): Promise<MessengerResponse>;
+    send(): Promise<FBTypes.MessengerResponse>;
 }
-export declare type LoggerFunction = (payload: MessengerPayload) => Promise<void>;
+export declare type LoggerFunction = (payload: FBTypes.MessengerPayload) => Promise<void>;
 export default class FBPlatform {
     protected token: string;
     protected sendInDevelopment: boolean;
@@ -121,31 +52,31 @@ export default class FBPlatform {
     setGraphURL(graphURL: string): void;
     turnOnSendingInDevelopment(state?: boolean): this;
     turnOnValidation(state?: boolean): this;
-    wrapMessage(id: string, message: MessengerMessage, notification_type: NotificationType): MessengerPayload;
+    wrapMessage(id: string, message: FBTypes.MessengerMessage, notification_type: FBTypes.NotificationType): FBTypes.MessengerPayload;
     private sendToFB(payload, path);
-    sendMessageToFB(id: string, message: MessengerMessage, notification_type?: NotificationType): Promise<MessengerResponse>;
+    sendMessageToFB(id: string, message: FBTypes.MessengerMessage, notification_type?: FBTypes.NotificationType): Promise<FBTypes.MessengerResponse>;
     createGenericMessage(id: string): FBGenericMessage;
-    exportGenericMessage(elements: Array<MessengerItem>): MessengerMessage;
-    sendGenericMessage(id: string, elements: Array<MessengerItem>): Promise<MessengerResponse>;
+    static exportGenericMessage(elements: Array<FBTypes.MessengerItem>, maxElements?: number): FBTypes.MessengerMessage;
+    sendGenericMessage(id: string, elements: Array<FBTypes.MessengerItem>): Promise<FBTypes.MessengerResponse>;
     createButtonMessage(id: string): FBButtonMessage;
-    exportButtonMessage(text: string, buttons: Array<MessengerButton> | FBButton): MessengerMessage;
-    sendButtonMessage(id: string, text: string, buttons: Array<MessengerButton> | FBButton): Promise<MessengerResponse>;
+    static exportButtonMessage(text: string, buttons: Array<FBTypes.MessengerButton> | FBButton, maxButtons?: number): FBTypes.MessengerMessage;
+    sendButtonMessage(id: string, text: string, buttons: Array<FBTypes.MessengerButton> | FBButton): Promise<FBTypes.MessengerResponse>;
     createTextMessage(id: string): FBTextMessage;
-    exportTextMessage(text: string): MessengerMessage;
-    sendTextMessage(id: string, text: string): Promise<MessengerResponse>;
+    static exportTextMessage(text: string): FBTypes.MessengerMessage;
+    sendTextMessage(id: string, text: string): Promise<FBTypes.MessengerResponse>;
     createQuickReplies(id: string): FBQuickReplies;
-    exportQuickReplies(text: string, quickReplies: Array<MessengerQuickReply>): MessengerMessage;
-    sendQuickReplies(id: string, text: string, quickReplies: Array<MessengerQuickReply>): Promise<MessengerResponse>;
-    sendSenderAction(id: string, senderAction: SenderAction): Promise<MessengerResponse>;
-    sendTypingIndicators(id: string): Promise<MessengerResponse>;
-    sendCancelTypingIndicators(id: string): Promise<MessengerResponse>;
-    sendReadReceipt(id: string): Promise<MessengerResponse>;
+    static exportQuickReplies(text: string, quickReplies: Array<FBTypes.MessengerQuickReply>, maxQuickReplies?: number): FBTypes.MessengerMessage;
+    sendQuickReplies(id: string, text: string, quickReplies: Array<FBTypes.MessengerQuickReply>): Promise<FBTypes.MessengerResponse>;
+    sendSenderAction(id: string, senderAction: FBTypes.SenderAction): Promise<FBTypes.MessengerResponse>;
+    sendTypingIndicators(id: string): Promise<FBTypes.MessengerResponse>;
+    sendCancelTypingIndicators(id: string): Promise<FBTypes.MessengerResponse>;
+    sendReadReceipt(id: string): Promise<FBTypes.MessengerResponse>;
     private sendSettingsToFB(payload);
-    setGetStartedPostback(payload: string): Promise<MessengerResponse>;
-    setPersistentMenu(buttons: Array<MessengerButton>): Promise<MessengerResponse>;
-    setGreetingText(text: string): Promise<MessengerResponse>;
-    createPostbackButton(title: string, payload: string): MessengerButton;
-    createWebButton(title: string, url: string): MessengerButton;
-    createQuickReply(title: string, payload: string): MessengerQuickReply;
-    getUserProfile(id: string): Promise<FacebookUser>;
+    setGetStartedPostback(payload: string): Promise<FBTypes.MessengerResponse>;
+    setPersistentMenu(buttons: Array<FBTypes.MessengerButton>): Promise<FBTypes.MessengerResponse>;
+    setGreetingText(text: string): Promise<FBTypes.MessengerResponse>;
+    createPostbackButton(title: string, payload: string): FBTypes.MessengerButton;
+    createWebButton(title: string, url: string): FBTypes.MessengerButton;
+    createQuickReply(title: string, payload: string): FBTypes.MessengerQuickReply;
+    getUserProfile(id: string): Promise<FBTypes.FacebookUser>;
 }
