@@ -1,6 +1,6 @@
 {
   "name": "facebook-send-api",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Promise based module to speak to the facebook send api for the messenger platform",
   "main": "lib/index.js",
   "scripts": {
