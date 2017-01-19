@@ -2,16 +2,15 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es5",
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "sourceMap": false,
-        "outDir": "../lib",
+        "outDir": "lib",
         "declaration": true
     },
     "exclude": [
         "node_modules"
     ],
-    "files": [
-      "typings/index.d.ts",
-      "index.ts"
+    "include": [
+      "src/**/*"
     ]
 }
